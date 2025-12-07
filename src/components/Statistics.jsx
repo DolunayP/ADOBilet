@@ -52,7 +52,7 @@ function Statistics() {
               className="text-6xl after:bg-white after:block after:w-10 after:h-1 
           after:mx-auto after:mt-8 after: mb-8 "
             >
-              {soldTickets.soldCount}
+              {soldTickets?.soldCount ?? 0}
             </h3>
             <h4 className="text-2xl uppercase">Tickets Sold</h4>
           </div>

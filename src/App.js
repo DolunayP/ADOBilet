@@ -10,7 +10,8 @@ import Footer from "./components/FooterComp/Footer";
 
 function App() {
   const [word, setWord] = useState("");
-  const [date, setDate] = useState("");
+  const [from, setFrom] = useState(""); // "YYYY-MM-DD"
+  const [to, setTo] = useState("");
   const [place, setPlace] = useState("");
 
   return (
@@ -18,12 +19,14 @@ function App() {
       <HeaderView
         word={word}
         setWord={setWord}
-        date={date}
-        setDate={setDate}
+        from={from}
+        setFrom={setFrom}
+        to={to}
+        setTo={setTo}
         place={place}
         setPlace={setPlace}
       />
-      {!word && !date && !place ? (
+      {!word && !to && !place ? (
         <>
           <SliderComp />
           <TimelineComp />
@@ -33,7 +36,7 @@ function App() {
         </>
       ) : (
         <>
-          <SearchComp word={word} date={date} place={place} />
+          <SearchComp word={word} from={from} to={to} place={place} />
           <Footer />
         </>
       )}

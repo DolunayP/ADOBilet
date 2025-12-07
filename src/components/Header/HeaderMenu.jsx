@@ -34,8 +34,10 @@ const HeaderMenu = () => {
         name: "Admin Panel",
         link: "/admin",
       },
+      { name: "Profile", link: "/profile" },
       { name: "Events", link: "/events" },
       { name: "Past Events", link: "/pastevents" },
+
       { name: "Logout", link: "/" },
     ];
   } else {
@@ -108,8 +110,10 @@ const HeaderMenu = () => {
                         window.location.href = "/events";
                       } else if (link.name === "Admin Panel") {
                         window.location.href = "/admin";
-                      } else {
+                      } else if (link.name === "Past Events") {
                         window.location.href = "/pastevents";
+                      } else {
+                        window.location.href = "/profile";
                       }
                     }}
                   >
@@ -131,7 +135,7 @@ const HeaderMenu = () => {
                         window.location.href = "/login";
                       } else if (link.name === "Events") {
                         window.location.href = "/events";
-                      } else {
+                      } else if (link.name === "past") {
                         window.location.href = "/pastevents";
                       }
                     }}

@@ -41,7 +41,7 @@ import EventPhotoUpdateForm from "./pages/admin/EventPhotos/EventPhotoUpdateForm
 import TicketPriceAddForm from "./pages/admin/TicketPrice/TicketPriceAddForm.jsx";
 import AssignTicketForm from "./pages/admin/AssignTicket/AssignTicketForm.jsx";
 import Contact from "./pages/Contact.jsx";
-
+import Profile from "./components/ProfileComp/Profile.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -74,11 +74,11 @@ const router = createBrowserRouter([
 
   {
     path: "/event/tickets/:id",
-    element: (
-      <ProtectedRouteAdmin>
-        <Tickets />
-      </ProtectedRouteAdmin>
-    ),
+    element: <Tickets />,
+  },
+  {
+    path: "/profile",
+    element: <Profile />,
   },
   {
     path: "/event/ticket/success",

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getArtistWithEvents } from "../../redux/dataSlice";
 import EventsComp from "../EventsComp/EventsComp";
 
-const SearchComp = ({ word, date, place }) => {
+const SearchComp = ({ word, from, to, place }) => {
   const { eventsWithArtists } = useSelector((state) => state.data);
   const dispatch = useDispatch();
   const [searchedEvents, setSearchedEvents] = useState([]);
@@ -11,34 +11,70 @@ const SearchComp = ({ word, date, place }) => {
   useEffect(() => {
     dispatch(getArtistWithEvents());
   }, [dispatch]);
+
   useEffect(() => {
-    // DatePicker tarafından gelen tarihi database formatına çevirme
-    const datePickerToDatabaseFormat = (datePickerDate) => {
-      const [year, month, day] = datePickerDate.split("-");
-      const databaseFormatDate = `${day}.${month}.${year}`;
-      return databaseFormatDate;
+    if (!eventsWithArtists) {
+      setSearchedEvents([]);
+      return;
+    }
+
+    // "DD.MM.YYYY" | "YYYY-MM-DD" | "DD/MM/YYYY" destekli parser
+    const parseEventDate = (s) => {
+      if (!s) return null;
+      if (s.includes(".")) {
+        const [d, m, y] = s.split(".");
+        return new Date(+y, +m - 1, +d, 12, 0, 0, 0);
+      }
+      if (s.includes("-")) {
+        const [y, m, d] = s.split("-");
+        return new Date(+y, +m - 1, +d, 12, 0, 0, 0);
+      }
+      if (s.includes("/")) {
+        const [d, m, y] = s.split("/");
+        return new Date(+y, +m - 1, +d, 12, 0, 0, 0);
+      }
+      return null;
     };
 
-    const filteredEvents = eventsWithArtists.filter((event) => {
-      const eventName = event.eventName.toLowerCase();
-      const eventDate = datePickerToDatabaseFormat(date);
-      const eventLocation = event.eventLocation.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      
-      const matchesWord = word ? eventName.includes(word.toLowerCase()) : true;
-      const matchesDate = date ? eventDate === event.eventDate : true;
-      const matchesPlace = place ? eventLocation.includes(place.toLowerCase()) : true;
+    const normalize = (str) =>
+      (str || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 
-      return matchesWord && matchesDate && matchesPlace;
+    const fromDate = from ? new Date(from) : null; // "YYYY-MM-DD" -> 00:00
+    const toDate = to ? new Date(to) : null; // "YYYY-MM-DD" -> 00:00
+
+    const results = eventsWithArtists.filter((ev) => {
+      const nameOk = word
+        ? normalize(ev.eventName).includes(normalize(word))
+        : true;
+      const placeOk = place
+        ? normalize(ev.eventLocation).includes(normalize(place))
+        : true;
+
+      // tarih aralığı
+      const dt = parseEventDate(ev.eventDate);
+      if (!dt) return nameOk && placeOk; // tarihi yoksa sadece kelime/yer filtresine bak
+
+      if (fromDate) {
+        const start = new Date(fromDate);
+        start.setHours(0, 0, 0, 0);
+        if (dt < start) return false;
+      }
+      if (toDate) {
+        const end = new Date(toDate);
+        end.setHours(23, 59, 59, 999);
+        if (dt > end) return false;
+      }
+
+      return nameOk && placeOk;
     });
 
-    setSearchedEvents(filteredEvents);
-  }, [word, date, eventsWithArtists, place]);
+    setSearchedEvents(results);
+  }, [word, from, to, place, eventsWithArtists]);
 
-  return (
-    <>
-      <EventsComp events={searchedEvents} />
-    </>
-  );
+  return <EventsComp events={searchedEvents} />;
 };
 
 export default SearchComp;
